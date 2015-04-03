@@ -3,7 +3,7 @@ import datetime
 import httplib
 
 # proxy = xmlrpclib.ServerProxy("http://192.168.100.2:8000/", verbose=False)
-proxy = xmlrpclib.ServerProxy("http://localhost:8000/", verbose=False)
+proxy = xmlrpclib.ServerProxy("http://192.168.100.5:8000/", verbose=False)
 print "3 is even: %s" % str(proxy.is_even(3))
 # print "100 is even: %s" % str(proxy.is_even(100))
 informacionServer = proxy.serverInfo()
