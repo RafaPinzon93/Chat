@@ -1,12 +1,53 @@
 import xmlrpclib
 import datetime
 from SimpleXMLRPCServer import SimpleXMLRPCServer
+from threading import Thread
+import time
 
-
-Nombre = None
-Passw = None
+# Nombre = None
+# Passw = None
 lastConn = None
+Contador = -1
+Nombres = {}
 
+Usuarios= []
+
+class User():
+    def __init__(self, userName, password):
+        self.userName = userName
+        self.password = password
+        self.hilo = None
+
+    def __str__(self):
+        return str(self.userName)
+
+    def stop(self):
+        self.hilo.stop()
+
+    def crearHilo(self):
+        if not self.hilo:
+            self.hilo = UserProcess(self.userName)
+            self.hilo.start()
+
+class UserProcess(Thread):
+    def __init__(self, nombre):
+        Thread.__init__(self)
+        self.runBool = False 
+        self.nombre = nombre
+
+    def run(self):
+        self.runBool = True
+        while self.runBool:
+            print "hola " + str(self.nombre)
+            time.sleep(1)
+
+    def stop(self):
+        self.runBool = False
+
+def cont():
+    global Contador
+    Contador += 1
+    return Contador
 
 def is_even(n):
     return n%2 == 0
@@ -37,32 +78,38 @@ def divide(x, y):
     return x/y
     
 def bye(x):
-	return "Chao %s"%x
-	
+    Usuarios[Nombres[x]].stop()
+    return "Chao %s"%x
+    
 def ingresar(x):
-	if x[0] == Nombre and Nombre:
-		if x[1] == Passw and Passw:
-			server.register_function(add, 'add')
-			server.register_function(subtract, 'subtract')
-			server.register_function(multiply, 'multiply')
-			server.register_function(divide, 'divide')
-			return True
-		else:
-			return False
-	else:
-		return False
+    if x[0] in Nombres and Nombres:
+        if x[1] == Usuarios[Nombres[x[0]]].password:
+            server.register_function(add, 'add')
+            server.register_function(subtract, 'subtract')
+            server.register_function(multiply, 'multiply')
+            server.register_function(divide, 'divide')
+            Usuarios[Nombres[x[0]]].crearHilo()
+            return True
+
+        else:
+            return False
+    else:
+        return False
 def registro(x):
-	global Nombre, Passw
-	Nombre = x[0]
-	Passw = x[1]
-	return "Ahora puede ingresar %s al servidor" %x[0]
-	
+    global Nombres
+    Nombre = x[0]
+    Passw = x[1]
+    Nombres[Nombre] = cont()
+    user = User(Nombre, Passw)
+    Usuarios.append(user)
+    return "Ahora puede ingresar %s al servidor" %x[0]
+    
 
 def hello(x):
-	return "Bienvenido %s\n"%x
+    return "Bienvenido %s\n"%x
 
 
-server = SimpleXMLRPCServer(("192.168.9.76", 8000))
+server = SimpleXMLRPCServer(("192.168.100.5", 8000))
 #server = SimpleXMLRPCServer(("localhost", 8000))
 print "Listening on port 8000..."
 
