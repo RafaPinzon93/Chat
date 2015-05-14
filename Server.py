@@ -111,7 +111,11 @@ def hello(x):
     return "Bienvenido %s\n"%x
 
 def escribir(mensaje, nombre):
+    global mensajes
     mensajes += mensaje + nombre + "\n"
+
+def retornarMensajes():
+    return mensajes
 
 
 server = SimpleXMLRPCServer(("192.168.100.5", 8000))

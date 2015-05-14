@@ -16,6 +16,7 @@ print("Bienvenido al cliente\n\n")
 #  print(proxy.hello(nombre))
 
 while True:
+    print proxy.retornarMensajes
     print("1. Registrarse")
     print("2. Ingresar")
     option = input('ingrese la opcion a elegir: ')
@@ -46,7 +47,8 @@ while True:
             print("4. Dividir dos numeros")
             print("5. Todas las operaciones anteriores")
             print("6. Direccion ip y puerto del servidor")
-            print("7. Salir")
+            print("7. Mandar mensaje")
+            print("8. Salir")
             option = input('ingrese la opcion a elegir: ')
             if(option == 1 ):
                 clear()
@@ -97,7 +99,11 @@ while True:
                 clear()
                 print(proxy.serverInfo())
                 print("\n\n")
-            elif(option == 7 ):
+            elif(option == 7):
+                print "ingrese el mensaje"
+                a = input()
+                proxy.escribir(a, nombre)
+            elif(option == 8 ):
                 print(proxy.bye(nombre))
                 break
 		
