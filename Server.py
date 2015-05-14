@@ -9,6 +9,7 @@ import time
 lastConn = None
 Contador = -1
 Nombres = {}
+mensajes = ""
 
 Usuarios= []
 
@@ -32,13 +33,14 @@ class User():
 class UserProcess(Thread):
     def __init__(self, nombre):
         Thread.__init__(self)
-        self.runBool = False 
+        self.runBool = False
         self.nombre = nombre
 
     def run(self):
         self.runBool = True
         while self.runBool:
-            print "hola " + str(self.nombre)
+            # print "hola " + str(self.nombre)
+            print mensajes
             time.sleep(1)
 
     def stop(self):
@@ -76,11 +78,11 @@ def multiply(x, y):
 
 def divide(x, y):
     return x/y
-    
+
 def bye(x):
     Usuarios[Nombres[x]].stop()
     return "Chao %s"%x
-    
+
 def ingresar(x):
     if x[0] in Nombres and Nombres:
         if x[1] == Usuarios[Nombres[x[0]]].password:
@@ -103,10 +105,13 @@ def registro(x):
     user = User(Nombre, Passw)
     Usuarios.append(user)
     return "Ahora puede ingresar %s al servidor" %x[0]
-    
+
 
 def hello(x):
     return "Bienvenido %s\n"%x
+
+def escribir(mensaje, nombre):
+    mensajes += mensaje + nombre + "\n"
 
 
 server = SimpleXMLRPCServer(("192.168.100.5", 8000))
