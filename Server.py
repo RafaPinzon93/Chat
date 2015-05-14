@@ -118,7 +118,7 @@ def retornarMensajes():
     return mensajes
 
 
-server = SimpleXMLRPCServer(("192.168.100.5", 8000))
+server = SimpleXMLRPCServer(("192.168.9.32", 8000))
 #server = SimpleXMLRPCServer(("localhost", 8000))
 print "Listening on port 8000..."
 

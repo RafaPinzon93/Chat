@@ -5,7 +5,7 @@ import os
 
 clear = lambda: os.system('clear')
 
-proxy = xmlrpclib.ServerProxy("http://192.168.100.5:8000/")
+proxy = xmlrpclib.ServerProxy("http://192.168.56.1:8000/")
 
 result = proxy.serverInfo()
 
