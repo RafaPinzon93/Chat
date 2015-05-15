@@ -3,6 +3,9 @@ import datetime
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from threading import Thread
 import time
+import signal
+
+# exitapp = False
 
 # Nombre = None
 # Passw = None
@@ -12,6 +15,7 @@ Nombres = {}
 mensajes = ""
 
 Usuarios= []
+
 
 class User():
     def __init__(self, userName, password):
@@ -40,7 +44,7 @@ class UserProcess(Thread):
         self.runBool = True
         while self.runBool:
             # print "hola " + str(self.nombre)
-            print mensajes
+            # print mensajes
             time.sleep(1)
 
     def stop(self):
@@ -90,6 +94,7 @@ def ingresar(x):
             server.register_function(subtract, 'subtract')
             server.register_function(multiply, 'multiply')
             server.register_function(divide, 'divide')
+            server.register_function(escribir, 'escribir')
             Usuarios[Nombres[x[0]]].crearHilo()
             return True
 
@@ -112,28 +117,38 @@ def hello(x):
 
 def escribir(mensaje, nombre):
     global mensajes
-    mensajes += mensaje + nombre + "\n"
+    mensajes += "\t-Usuario: "+ nombre.upper() +": "+ mensaje + "\n"
+    return 0
 
 def retornarMensajes():
     return mensajes
 
+if __name__ == '__main__':
+    global exitapp
+    try:
+        # server = SimpleXMLRPCServer(("192.168.9.32", 8000))
+        server = SimpleXMLRPCServer(("localhost", 8000))
+        print "Listening on port 8000..."
 
-server = SimpleXMLRPCServer(("192.168.9.32", 8000))
-#server = SimpleXMLRPCServer(("localhost", 8000))
-print "Listening on port 8000..."
-
-server.register_multicall_functions() # Just send a single request for multiple calls
-#server.register_function(add, 'add')
-#server.register_function(subtract, 'subtract')
-#server.register_function(multiply, 'multiply')
-#server.register_function(divide, 'divide')
-server.register_function(bye, 'bye')
-server.register_function(hello, 'hello')
-server.register_function(ingresar, 'ingresar')
-server.register_function(registro, 'registro')
+        server.register_multicall_functions() # Just send a single request for multiple calls
+        #server.register_function(add, 'add')
+        #server.register_function(subtract, 'subtract')
+        #server.register_function(multiply, 'multiply')
+        #server.register_function(divide, 'divide')
+        server.register_function(bye, 'bye')
+        server.register_function(hello, 'hello')
+        server.register_function(ingresar, 'ingresar')
+        server.register_function(registro, 'registro')
+        server.register_function(retornarMensajes, 'retornarMensajes')
 
 
-server.register_function(is_even, "is_even")
-server.register_function(today, "today")
-server.register_function(serverInfo, "serverInfo")
-server.serve_forever()
+        server.register_function(is_even, "is_even")
+        server.register_function(today, "today")
+        server.register_function(serverInfo, "serverInfo")
+        server.serve_forever()
+    except (KeyboardInterrupt, SystemExit):
+        print "hola"
+        for usuario in Usuarios:
+            usuario.stop()
+        raise
+

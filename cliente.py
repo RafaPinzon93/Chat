@@ -1,24 +1,27 @@
-__author__ = 'noescobar'
-
 import xmlrpclib
 import os
 
-clear = lambda: os.system('cls')
+if os.name == 'posix':
+    clear = lambda: os.system('clear')
+else:
+    clear = lambda: os.system('cls')
 
-proxy = xmlrpclib.ServerProxy("http://192.168.9.32:8000/")
+# proxy = xmlrpclib.ServerProxy("http://192.168.9.32:8000/")
+proxy = xmlrpclib.ServerProxy("http://localhost:8000/")
 
 result = proxy.serverInfo()
 
 ingresado = False
 
-print("Bienvenido al cliente\n\n")
+
 
 #  nombre = raw_input("Ingrese su nombre : ")
 
 #  print(proxy.hello(nombre))
 
 while True:
-    print str(proxy.retornarMensajes())
+    clear()
+    print("Bienvenido al CHAT\n\n")
     if not ingresado:
         print("1. Registrarse")
         print("2. Ingresar")
@@ -34,17 +37,19 @@ while True:
                     break
             userInfo = [nombre,password]
             print(str(proxy.registro(userInfo)))
-            print("\n\n")
+            ingresado = proxy.ingresar(userInfo)
+            # print("\n\n")
         elif(option == 2 ):
             clear()
             nombre = raw_input("Ingrese su nombre : ")
             password = raw_input("Ingrese su password : ")
             userInfo = [nombre,password]
             ingresado = proxy.ingresar(userInfo)
-            print("\n\n")
+            # print("\n\n")
         # print(ingresado)
     else:
-        a = raw_input("ingrese el mensaje: ")
+        print str(proxy.retornarMensajes())
+        a = raw_input("Ingrese el mensaje (para salir digite \"/salir\"): ")
         if a == "/salir":
             print(proxy.bye(nombre))
             break
