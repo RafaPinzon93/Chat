@@ -1,4 +1,3 @@
-import xmlrpclib
 import datetime
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 import xmlrpclib
@@ -55,7 +54,10 @@ class User:
         :param to_username: nombre del usuario al cual se planea enviar el mensaje
         :return: retorna un valor de verdad si el mensaje es enviado con exito
         """
-        pass
+        if to_username in self.users_objects.keys():
+            return self.users_objects[to_username].post_message(message, self.user_name)
+        else:
+            return False
 
     def post_message(self, message, from_username):
         """
@@ -63,14 +65,24 @@ class User:
         :param from_username: un string que me dice cual es el usuario del que proviene el mensaje.
         :return:
         """
-        pass
+        chats = self.chats
+        if from_username in chats.keys():
+            chats[from_username].append(message)
+        else:
+            chats[from_username] = [message]
 
     def get_messages(self, username):
         """
 
         :return: diccionario: se devolvera el diccionario con todos lo mensajes de llegada de un usuario y se limpiara
         """
-        pass
+        chats = self.chats
+        if username in chats.keys():
+            messages = chats[username]
+            chats[username] = []
+            return messages
+        else:
+            return []
 
     def get_all_messages(self):
         """
@@ -78,6 +90,7 @@ class User:
         :return: diccionario: se devolvera el diccionario con todos lo mensajes de llegada y  de esta forma se limpiaran
                  los mensajes.
         """
+        return self.chats
 
     def __str__(self):
         return str(self.user_name)
@@ -191,12 +204,16 @@ def send_message(from_username, to_username, message):
         :return:
         """
         usuario_object = None
-        if from_username in nombres.keys():
-            user_position = nombres['from_username']
-            usuario_object = usuarios[user_position]
+        if to_username == '#publico':
+            for usuario in usuarios:
+                usuario.post_message(message, from_username)
+        else:
+            if from_username in nombres.keys():
+                user_position = nombres[from_username]
+                usuario_object = usuarios[user_position]
 
-        if usuario_object:
-            usuario_object.send_message(message=message,to_username=to_username)
+            if usuario_object:
+                usuario_object.send_message(message=message, to_username=to_username)
         return "success"
     thread.start_new_thread(funcion, ())
     return True
@@ -208,6 +225,15 @@ def get_new_message(from_username, other_username):
     :param other_username:
     :return:
     """
+    usuario_object = None
+    if from_username in nombres.keys():
+        user_position = nombres[from_username]
+        usuario_object = usuarios[user_position]
+
+    if usuario_object:
+        return usuario_object.get_messages(other_username)
+    else:
+        return []
 
 
 def get_all_new_messages(from_username):
@@ -216,8 +242,22 @@ def get_all_new_messages(from_username):
     :param from_usernmae:
     :return:
     """
+    usuario_object = None
+    if from_username in nombres.keys():
+        user_position = nombres[from_username]
+        usuario_object = usuarios[user_position]
+
+    if usuario_object:
+        return usuario_object.get_all_messages()
+    else:
+        return {}
+
 
 def get_all_usernames():
+    """
+
+    :return:
+    """
     return nombres.keys()
 
 
@@ -239,6 +279,7 @@ server.register_function(hello, 'hello')
 server.register_function(ingresar, 'ingresar')
 server.register_function(registro, 'registro')
 server.register_function(get_all_new_messages, 'get_all_new_messages')
+server.register_function(get_all_usernames, 'get_all_usernames')
 server.register_function(get_new_message, 'get_new_message')
 server.register_function(send_message, 'send_message')
 
